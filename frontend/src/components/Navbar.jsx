@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Top navigation for auth and tracker routes.
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Clears auth state and returns users to the login page.
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -13,13 +15,14 @@ const Navbar = () => {
   return (
     <nav className='bg-blue-600 text-white p-4 flex justify-between items-center'>
       <Link to='/' className='text-2xl font-bold'>
-        Your apps name
+        Time Tracker
       </Link>
       <div>
         {user ? (
           <>
+            {/* Primary authenticated destination for timer and entry management. */}
             <Link to='/tracker' className='mr-4'>
-              CRUD
+              Tracker
             </Link>
             <Link to='/profile' className='mr-4'>
               Profile

@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import Tasks from './pages/Tasks';
+import Tracker from './pages/Tracker';
 import { useAuth } from './context/AuthContext';
 
 // App route map for public and authenticated navigation.
@@ -29,8 +29,8 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/profile' element={<Profile />} />
-        {/* Temporary tracker target that currently reuses the Tasks page. */}
-        <Route path='/tracker' element={<Tasks />} />
+        {/* Main authenticated tracker screen. */}
+        <Route path='/tracker' element={<Tracker />} />
         {/* Keep /tasks as an alias so existing links still work during transition. */}
         <Route path='/tasks' element={<Navigate to='/tracker' replace />} />
       </Routes>
