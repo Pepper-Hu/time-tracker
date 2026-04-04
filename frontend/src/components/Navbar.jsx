@@ -9,8 +9,8 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Clears auth state and returns users to the login page.
-  const handleLogout = () => {
+  // Clears auth state and returns users to the sign in page.
+  const handleSignOut = () => {
     logout();
     navigate('/login');
     setDropdownOpen(false);
@@ -62,10 +62,10 @@ const Navbar = () => {
                   Profile
                 </button>
                 <button
-                  onClick={handleLogout}
+                  onClick={handleSignOut}
                   className='w-full text-left px-4 py-2 hover:bg-red-50 text-red-600'
                 >
-                  Logout
+                  Sign Out
                 </button>
               </div>
             )}
@@ -73,13 +73,13 @@ const Navbar = () => {
         ) : (
           <>
             <Link to='/login' className='mr-4'>
-              Login
+              Sign In
             </Link>
             <Link
               to='/register'
               className='bg-green-500 px-4 py-2 rounded hover:bg-green-700'
             >
-              Register
+              Sign Up
             </Link>
           </>
         )}

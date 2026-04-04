@@ -5,8 +5,8 @@ import {
   Route,
 } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 import Profile from './pages/Profile';
 import Tracker from './pages/Tracker';
 import { useAuth } from './context/AuthContext';
@@ -26,8 +26,8 @@ function App() {
           path='/'
           element={<Navigate to={user ? '/tracker' : '/login'} replace />}
         />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+        <Route path='/login' element={<SignIn />} />
+        <Route path='/register' element={<SignUp />} />
         <Route path='/profile' element={<Profile />} />
         {/* Main authenticated tracker screen. */}
         <Route path='/tracker' element={<Tracker />} />
