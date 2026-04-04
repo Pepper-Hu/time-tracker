@@ -7,8 +7,7 @@
 # - Runtime: Node.js 22.
 # - Checks performed: Install backend dependencies and execute Mocha test suite.
 # - Later update: replace this with the EC2/self-hosted runner deployment workflow.
-
-# - Trigger refresh note: workflow syntax fixed and retriggered on 2026-04-05.
+# - Trigger refresh note: syntax fix retriggered on 2026-04-05.
 
 name: Backend CI
 
