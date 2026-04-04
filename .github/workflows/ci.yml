@@ -8,6 +8,8 @@
 # - Checks performed: Install backend dependencies and execute Mocha test suite.
 # - Later update: replace this with the EC2/self-hosted runner deployment workflow.
 
+# - Trigger refresh note: workflow syntax fixed and retriggered on 2026-04-05.
+
 name: Backend CI
 
 # Define workflow triggers.
