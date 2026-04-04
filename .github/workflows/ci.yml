@@ -1,55 +1,34 @@
-# CI Workflow
-#
-# Summary:
-# - Purpose: Temporary CI-only workflow to run automated backend tests without EC2.
-# - Triggered on: push to main branch only.
-# - Environment: GitHub-hosted Ubuntu runner.
-# - Runtime: Node.js 22.
-# - Checks performed: Install backend dependencies and execute Mocha test suite.
-# - Later update: replace this with the EC2/self-hosted runner deployment workflow.
-# - Trigger refresh note: syntax fix retriggered on 2026-04-05.
-
 name: Backend CI
 
-# Define workflow triggers.
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
-# Define jobs executed by this workflow.
 jobs:
-    test:
-        name: Run Backend Tests
-        # TODO(IFN636): Change to `self-hosted` after EC2 GitHub runner is configured (Tutorial 5, Phase 3).
-        # Use GitHub-hosted Linux runner.
-        runs-on: ubuntu-latest
+  test:
+    name: Run Backend Tests
+    runs-on: ubuntu-latest
 
-        # Matrix allows easy extension for multiple Node versions.
-        strategy:
-            matrix:
-                node-version: [22]
+    strategy:
+      matrix:
+        node-version: [22]
 
-        # Sequential CI steps.
-        steps:
-            # Step 1: Clone repository to runner.
-            - name: Checkout code
-                uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            # Step 2: Configure Node.js and npm cache.
-            - name: Setup Node.js
-                uses: actions/setup-node@v4
-                with:
-                    node-version: ${{ matrix.node-version }}
-                    cache: npm
-                    cache-dependency-path: backend/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-            # Step 3: Install backend dependencies using a clean lockfile install.
-            - name: Install backend dependencies
-                working-directory: ./backend
-                run: npm ci
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
 
-            # Step 4: Run backend unit tests (Mocha + Chai + Sinon).
-            - name: Run backend tests
-                working-directory: ./backend
-                run: npm test
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test
