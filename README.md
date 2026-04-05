@@ -19,6 +19,15 @@ This repository contains:
 
 Note: The deployment currently uses HTTP. HTTPS is not configured.
 
+## Demo Account
+
+Use the following account to access the dashboard:
+
+- Email: haru@gmail.com
+- Password: 1234567
+
+Note: This is a project-specific demo account provided for assessment access.
+
 ## Features
 
 - User registration and sign in
