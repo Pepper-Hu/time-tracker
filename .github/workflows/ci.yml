@@ -64,12 +64,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Validate required deployment secrets
-        run: |
-          [ -n "${{ secrets.MONGO_URI }}" ] || { echo "MONGO_URI is missing"; exit 1; }
-          [ -n "${{ secrets.JWT_SECRET }}" ] || { echo "JWT_SECRET is missing"; exit 1; }
-          [ -n "${{ secrets.PORT }}" ] || { echo "PORT is missing"; exit 1; }
-
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
@@ -77,10 +71,17 @@ jobs:
       - name: Create backend .env from GitHub secrets
         working-directory: ./backend
         run: |
-          printf "MONGO_URI=%s\nJWT_SECRET=%s\nPORT=%s\n" \
-            "${{ secrets.MONGO_URI }}" \
-            "${{ secrets.JWT_SECRET }}" \
-            "${{ secrets.PORT }}" > .env
+          if [ -n "${{ secrets.PROD }}" ]; then
+            printf "%s\n" "${{ secrets.PROD }}" > .env
+          else
+            [ -n "${{ secrets.MONGO_URI }}" ] || { echo "MONGO_URI is missing"; exit 1; }
+            [ -n "${{ secrets.JWT_SECRET }}" ] || { echo "JWT_SECRET is missing"; exit 1; }
+            [ -n "${{ secrets.PORT }}" ] || { echo "PORT is missing"; exit 1; }
+            printf "MONGO_URI=%s\nJWT_SECRET=%s\nPORT=%s\n" \
+              "${{ secrets.MONGO_URI }}" \
+              "${{ secrets.JWT_SECRET }}" \
+              "${{ secrets.PORT }}" > .env
+          fi
 
       - name: Verify backend .env
         working-directory: ./backend
