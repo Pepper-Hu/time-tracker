@@ -27,12 +27,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Validate required secrets
-        run: |
-          [ -n "${{ secrets.MONGO_URI }}" ] || { echo "MONGO_URI is missing"; exit 1; }
-          [ -n "${{ secrets.JWT_SECRET }}" ] || { echo "JWT_SECRET is missing"; exit 1; }
-          [ -n "${{ secrets.PORT }}" ] || { echo "PORT is missing"; exit 1; }
-
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
@@ -40,9 +34,7 @@ jobs:
       - name: Run backend tests
         working-directory: ./backend
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: test-secret-for-ci
         run: npm test
 
       - name: Install frontend dependencies and build
