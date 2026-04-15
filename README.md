@@ -14,8 +14,8 @@ This repository contains:
 
 ## Live Deployment
 
-- Public URL: http://54.252.140.237
-- Backend API base URL: http://54.252.140.237:5001
+- Public URL: http://54.252.160.190
+- Backend API base URL: http://54.252.160.190:5001
 
 Note: The deployment currently uses HTTP. HTTPS is not configured.
 
@@ -216,7 +216,7 @@ On the EC2 instance, the following were configured:
 
 The live app is accessible at:
 
-- http://54.252.140.237
+- http://54.252.160.190
 
 If the browser does not load over HTTPS, use HTTP. HTTPS is not configured for this deployment.
 
