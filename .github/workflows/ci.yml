@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
-    name: Test and Deploy on EC2
+  build-and-test:
+    name: Build and Test
     runs-on: [self-hosted, Linux, X64]
 
     strategy:
@@ -24,10 +27,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Stop existing PM2 apps
+      - name: Validate required secrets
         run: |
-          pm2 stop all || true
-          pm2 delete all || true
+          [ -n "${{ secrets.MONGO_URI }}" ] || { echo "MONGO_URI is missing"; exit 1; }
+          [ -n "${{ secrets.JWT_SECRET }}" ] || { echo "JWT_SECRET is missing"; exit 1; }
+          [ -n "${{ secrets.PORT }}" ] || { echo "PORT is missing"; exit 1; }
 
       - name: Install backend dependencies
         working-directory: ./backend
@@ -35,19 +39,11 @@ jobs:
 
       - name: Run backend tests
         working-directory: ./backend
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: ${{ secrets.PORT }}
         run: npm test
-
-      - name: Create backend .env from GitHub secrets
-        working-directory: ./backend
-        run: |
-          cat > .env << EOF
-          MONGO_URI=${{ secrets.MONGO_URI }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          PORT=${{ secrets.PORT }}
-          EOF
-
-      - name: Start backend with PM2
-        run: pm2 start "npm --prefix backend run start" --name backend
 
       - name: Install frontend dependencies and build
         working-directory: ./frontend
@@ -56,8 +52,65 @@ jobs:
           rm -rf ./build
           npm run build
 
-      - name: Start frontend with PM2
-        run: pm2 serve frontend/build 3000 --name frontend --spa
+  deploy:
+    name: Deploy on EC2
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Linux, X64]
+
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Validate required deployment secrets
+        run: |
+          [ -n "${{ secrets.MONGO_URI }}" ] || { echo "MONGO_URI is missing"; exit 1; }
+          [ -n "${{ secrets.JWT_SECRET }}" ] || { echo "JWT_SECRET is missing"; exit 1; }
+          [ -n "${{ secrets.PORT }}" ] || { echo "PORT is missing"; exit 1; }
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Create backend .env from GitHub secrets
+        working-directory: ./backend
+        run: |
+          printf "MONGO_URI=%s\nJWT_SECRET=%s\nPORT=%s\n" \
+            "${{ secrets.MONGO_URI }}" \
+            "${{ secrets.JWT_SECRET }}" \
+            "${{ secrets.PORT }}" > .env
+
+      - name: Verify backend .env
+        working-directory: ./backend
+        run: |
+          test -s .env || { echo ".env was not created"; exit 1; }
+          grep -q '^MONGO_URI=mongodb\(\+srv\)\?://' .env || { echo "MONGO_URI is invalid"; exit 1; }
+          grep -q '^JWT_SECRET=.' .env || { echo "JWT_SECRET is empty"; exit 1; }
+          grep -q '^PORT=[0-9][0-9]*$' .env || { echo "PORT is invalid"; exit 1; }
+
+      - name: Install frontend dependencies and build
+        working-directory: ./frontend
+        run: |
+          npm ci
+          rm -rf ./build
+          npm run build
+
+      - name: Restart PM2 apps
+        run: |
+          pm2 stop all || true
+          pm2 delete all || true
+          pm2 start "npm --prefix backend run start" --name backend
+          pm2 serve frontend/build 3000 --name frontend --spa
 
       - name: Save PM2 process list
         run: pm2 save
