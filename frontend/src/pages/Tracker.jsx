@@ -71,6 +71,8 @@ const Tracker = () => {
         localStorage.setItem(RUNNING_TIMER_STORAGE_KEY, running.startTime);
       } else {
         setRunningEntryId(null);
+        setRunningStartTime(null);
+        localStorage.removeItem(RUNNING_TIMER_STORAGE_KEY);
       }
     } catch (error) {
       alert('Failed to load time entries.');
@@ -129,6 +131,7 @@ const Tracker = () => {
   const handleStart = async () => {
     if (!user?.token || runningStartTime || saving) return;
     const now = new Date().toISOString();
+    setTick(Date.now());
     setRunningStartTime(now);
     setRunningEntryId(null);
     localStorage.setItem(RUNNING_TIMER_STORAGE_KEY, now);
