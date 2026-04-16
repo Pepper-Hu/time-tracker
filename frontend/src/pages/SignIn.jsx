@@ -17,12 +17,15 @@ const SignIn = () => {
     try {
       // Authenticate against backend auth endpoint.
       const response = await axiosInstance.post('/api/auth/login', formData);
+      if (!response?.data?.token) {
+        throw new Error('Invalid auth response');
+      }
       // Persist user/token through AuthContext.
       login(response.data);
       // Route to the dedicated authenticated landing page.
       navigate('/tracker');
     } catch (error) {
-      setError('Sign in failed. Please try again.');
+      setError('Sign in failed. Please check API deployment and try again.');
     }
   };
 

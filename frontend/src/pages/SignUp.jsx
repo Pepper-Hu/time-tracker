@@ -17,10 +17,13 @@ const SignUp = () => {
     e.preventDefault();
     setError('');
     try {
-      await axiosInstance.post('/api/auth/register', formData);
+      const response = await axiosInstance.post('/api/auth/register', formData);
+      if (!response?.data?.token) {
+        throw new Error('Invalid auth response');
+      }
       navigate('/login');
     } catch (error) {
-      setError('Sign up failed. Please try again.');
+      setError('Sign up failed. Please check API deployment and try again.');
     }
   };
 
